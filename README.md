@@ -67,6 +67,10 @@ scripts/      build-android-core.sh
 - **[p1neappleXpress](https://github.com/p1neappleXpress)** — author of the
   [OpenFlux](https://github.com/p1neappleXpress/OpenFlux) core this app
   embeds: the tunnel, transports, and negotiation protocol.
+- **[damnurmum](https://github.com/damnurmum)** — author of
+  [OpenFlux-Android](https://github.com/damnurmum/OpenFlux-Android) and,
+  in the core, `openflux://` links and QR codes, and the cups.online
+  transport, which this app's share and scan screens build on. Thank you!
 
 ## License
 

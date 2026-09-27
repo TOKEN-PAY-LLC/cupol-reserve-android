@@ -42,6 +42,7 @@ class AndroidPlatformServices(
     override val kind = PlatformKind.Android
     override val appVersion: String = BuildConfig.VERSION_NAME
     override val coreVersion: String = BuildConfig.CORE_VERSION
+    override val clientRepo: String = RELEASE_REPO
     override val systemProxySupported = false
     /** The VPN: the whole phone through the node. */
     override val fullTunnelSupported = true
@@ -140,8 +141,8 @@ class AndroidPlatformServices(
     }
 
     private companion object {
-        const val RELEASE_REPO = "meepo161/OpenFluxClient"
-        const val TAG_PREFIX = "android-client-v"
+        const val RELEASE_REPO = "p1neappleXpress/OpenFluxAndroid"
+        const val TAG_PREFIX = "v"
         const val MAX_QR_IMAGE = 2048
         val IMAGE_EXTENSIONS = setOf("png", "jpg", "jpeg", "bmp", "gif", "webp")
     }
