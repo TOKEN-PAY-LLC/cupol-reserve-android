@@ -3,6 +3,29 @@
 All notable changes to OpenFluxAndroid. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2.0.1] - 2026-09-27
+
+### Fixed
+
+- An exit node deployed by the node wizard never actually connected: a
+  `.conf`-only `Role = exit` (every node-wizard deployment) left the core's
+  internal exit/client flag stuck at its pre-config value, so the exit
+  never answered the handshake and crash-looped instead. Bumps `OpenFlux`
+  to [`e8f735a`](https://github.com/p1neappleXpress/OpenFlux/commit/e8f735a98c1ba9e091956416fde5c5ef92d3cd66).
+- The startup log always printed `Transport: yandex` for session/multi-transport
+  profiles regardless of which transports were actually configured (a stale
+  flag default, not a functional bug — the correct transports ran either
+  way). Now prints the actual list, e.g. `Transport: boards, direct (session)`.
+- Cups.online profiles with no room codes couldn't be saved or connected;
+  the node generates its own rooms, so an empty value is valid for this
+  transport only.
+
+### Added
+
+- Node-wizard deployment logging: every SSH/RPC call and the wizard's own
+  step narration now goes to the Logs tab, so a stuck deployment is
+  diagnosable without a debugger.
+
 ## [2.0.0] - 2026-09-27
 
 First release of this app. Replaces the previous single-transport native
