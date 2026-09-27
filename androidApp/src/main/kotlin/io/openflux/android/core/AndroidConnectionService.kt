@@ -275,6 +275,7 @@ class AndroidConnectionService(
     private fun startCarrier(current: Run): String {
         val profile = current.profile
         val secret = profile.secret
+        Mobile.setDebugLevel(current.settings.debugLevel.toLong())
         return if (profile.session) {
             val specs = CoreSpecs.session(profile, exit = current.kind == Kind.Exit, directPort = current.settings.exitDirectPort)
             when (current.kind) {
@@ -572,9 +573,9 @@ class AndroidConnectionService(
         for (raw in text.lineSequence()) {
             val line = raw.trimEnd()
             if (line.isEmpty()) continue
-            val level = levelOf(line)
-            if (level == LogLevel.Debug && !settings.settings.value.verboseCoreLog) continue
-            log(level, line)
+            // The core itself only emits up to the level startCarrier set via
+            // Mobile.setDebugLevel, so nothing left to filter here.
+            log(levelOf(line), line)
         }
     }
 
