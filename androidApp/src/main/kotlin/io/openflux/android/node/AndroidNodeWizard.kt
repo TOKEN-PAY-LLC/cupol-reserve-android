@@ -7,6 +7,7 @@ import io.openflux.desktop.model.LogLine
 import io.openflux.desktop.model.NewChannel
 import io.openflux.desktop.model.NodeDocuments
 import io.openflux.desktop.model.NodePlan
+import io.openflux.desktop.model.NodeTransport
 import io.openflux.desktop.model.NodeWizardException
 import io.openflux.desktop.model.ServerProbe
 import io.openflux.desktop.model.SshTarget
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.booleanOrNull
@@ -63,16 +65,28 @@ class AndroidNodeWizard : NodeWizardService {
         return NewChannel(reply.string("id"), reply.string("key"))
     }
 
-    override suspend fun plan(channel: String, withCookies: Boolean): NodePlan {
-        val reply = call("nodePlan", "channel=$channel withCookies=$withCookies") { Mobile.nodePlan(channel, 0, withCookies) }
+    override suspend fun plan(channel: String, transports: List<NodeTransport>, withCookies: Boolean, autoUpdate: Boolean): NodePlan {
+        val reply = call("nodePlan", "channel=$channel ${transports.names()} withCookies=$withCookies autoUpdate=$autoUpdate") {
+            Mobile.nodePlan(channel, 0, transports.json(), withCookies, autoUpdate)
+        }
         return json.decodeFromJsonElement(NodePlan.serializer(), reply.getValue("plan"))
     }
 
-    override suspend fun apply(channel: NewChannel, documentUrl: String, port: Int, sudoPassword: String, cookieHeader: String) {
-        call("nodeApply", "channel=${channel.id} port=$port") {
-            Mobile.nodeApply(channel.id, documentUrl, channel.key, port.toLong(), sudoPassword, cookieHeader)
+    override suspend fun apply(
+        channel: NewChannel,
+        transports: List<NodeTransport>,
+        port: Int,
+        autoUpdate: Boolean,
+        sudoPassword: String,
+        cookieHeader: String,
+    ) {
+        call("nodeApply", "channel=${channel.id} ${transports.names()} port=$port autoUpdate=$autoUpdate") {
+            Mobile.nodeApply(channel.id, transports.json(), channel.key, port.toLong(), autoUpdate, sudoPassword, cookieHeader)
         }
     }
+
+    override suspend fun createCupsRooms(): String =
+        call("nodeCreateCupsRooms") { Mobile.nodeCreateCupsRooms() }.string("rooms")
 
     override suspend fun remove(channel: String, sudoPassword: String) {
         call("nodeRemove", "channel=$channel") { Mobile.nodeRemove(channel, sudoPassword) }
@@ -82,11 +96,11 @@ class AndroidNodeWizard : NodeWizardService {
         call("nodeCheckDocument") { Mobile.nodeCheckDocument(documentUrl) }
     }
 
-    override suspend fun shareLink(name: String, documentUrl: String, key: String, host: String, port: Int): String =
+    override suspend fun shareLink(name: String, key: String, host: String, port: Int, transports: List<NodeTransport>): String =
         withContext(Dispatchers.IO) {
-            log(LogLevel.Debug, "мастер: → nodeShareLink $host:$port")
+            log(LogLevel.Debug, "мастер: → nodeShareLink $host:$port ${transports.names()}")
             try {
-                Mobile.nodeShareLink(name, documentUrl, key, host, port.toLong()).also {
+                Mobile.nodeShareLink(name, transports.json(), key, host, port.toLong()).also {
                     log(LogLevel.Debug, "мастер: ← nodeShareLink $host:$port ok")
                 }
             } catch (e: Exception) {
@@ -197,6 +211,11 @@ class AndroidNodeWizard : NodeWizardService {
             reply
         }
     }
+
+    private fun List<NodeTransport>.json() = json.encodeToString(ListSerializer(NodeTransport.serializer()), this)
+
+    /** For the log: the types only, links and rooms stay out. */
+    private fun List<NodeTransport>.names() = "transports=" + joinToString(",") { it.type }.ifEmpty { "direct" }
 
     private fun JsonObject.string(name: String) =
         this[name]?.jsonPrimitive?.content ?: throw NodeWizardException("Ядро не вернуло $name")

@@ -3,6 +3,23 @@
 All notable changes to OpenFluxAndroid. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- «Своя нода»: a new channel is no longer Yandex-only. Step 2 picks any mix
+  of a Yandex document (Volga), a Mail.ru public document and cups.online
+  rooms (created automatically), with direct always on as the backup; the
+  link and the saved profile carry all of them. The node gets the Yandex
+  sign-in only when the channel has a Yandex document.
+- «Автообновление ядра» on the plan step (on by default): the server's
+  `openflux-node-update.timer` checks the newest `node-v*` release every
+  6 hours, verifies it against the release's `node-install.sh` and
+  `SHA256SUMS`, restarts the channels and rolls back if one does not stay
+  up.
+- Bumps `OpenFlux` to [`1394680`](https://github.com/p1neappleXpress/OpenFlux/commit/1394680027f7d2cf448f17267c13b9f5a44b859b)
+  and `shared` to [`abf9c97`](https://github.com/p1neappleXpress/OpenFluxClientShared/commit/abf9c97a75f1fac9e09cbcc81aa74a754ef76aa3).
+
 ## [2.0.1] - 2026-09-27
 
 ### Fixed
