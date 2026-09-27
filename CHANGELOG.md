@@ -19,6 +19,13 @@ All notable changes to OpenFluxAndroid. Format loosely follows
 - Cups.online profiles with no room codes couldn't be saved or connected;
   the node generates its own rooms, so an empty value is valid for this
   transport only.
+- An exit node always listened for Direct (TCP on `0.0.0.0:<port>`) and put
+  it into the clients' link, even when the profile had no Direct transport.
+  It now listens only when the profile has Direct, at that transport's
+  priority ([#11](https://github.com/p1neappleXpress/OpenFluxAndroid/pull/11)).
+- A phone exit on cups.online without room codes put cups.online into its
+  link with no rooms, so clients could not join; the link now carries the
+  rooms the node created ([OpenFlux#123](https://github.com/p1neappleXpress/OpenFlux/pull/123)).
 
 ### Added
 
@@ -33,6 +40,9 @@ All notable changes to OpenFluxAndroid. Format loosely follows
 - Node-wizard deployment logging: every SSH/RPC call and the wizard's own
   step narration now goes to the Logs tab, so a stuck deployment is
   diagnosable without a debugger.
+- Home → Подключение: a "Сейчас через" row for profiles with several
+  transports, and carriers named as in the app ("Board 2", not `boards-2`)
+  there and in the "через …" badge.
 
 ## [2.0.0] - 2026-09-27
 
