@@ -119,7 +119,16 @@ jobs:
         run: |
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then tag="${GITHUB_REF#refs/tags/}"
           else tag="v${{ inputs.version }}"; fi
-          gh release create "$tag" dist/* \
-            --title "OpenFluxAndroid $tag" \
-            --generate-notes \
-            --notes "APK универсальный или под архитектуру устройства. Ядро: \`$(git -C OpenFlux rev-parse --short HEAD)\`. Контрольные суммы — в \`SHA256SUMS.txt\`."
+          notes="APK универсальный или под архитектуру устройства. Ядро: \`$(git -C OpenFlux rev-parse --short HEAD)\`. Контрольные суммы — в \`SHA256SUMS.txt\`."
+          if gh release view "$tag" >/dev/null 2>&1; then
+            # The tag was moved to rebuild an existing release: replace its
+            # assets and refresh the notes instead of failing on create.
+            generated=$(gh api "repos/$GITHUB_REPOSITORY/releases/generate-notes" -f tag_name="$tag" --jq .body)
+            gh release upload "$tag" dist/* --clobber
+            gh release edit "$tag" --title "OpenFluxAndroid $tag" --notes "$notes"$'\n\n'"$generated"
+          else
+            gh release create "$tag" dist/* \
+              --title "OpenFluxAndroid $tag" \
+              --generate-notes \
+              --notes "$notes"
+          fi

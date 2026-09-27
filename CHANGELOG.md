@@ -22,6 +22,14 @@ All notable changes to OpenFluxAndroid. Format loosely follows
 
 ### Added
 
+- Settings → Ядро OpenFlux: a core log-level picker (Выкл / -d / -dd /
+  -ddd, the core's `--debug=N`) in place of the "Подробный журнал ядра"
+  switch. The embedded core used to run at -dd on every connect whatever
+  the switch said — formatting a log line for every packet — and the
+  switch only hid those lines from the log view; the level now reaches the
+  core itself ([OpenFlux#121](https://github.com/p1neappleXpress/OpenFlux/pull/121)).
+  The default is Выкл: choose -dd to see transport errors, handshakes and
+  the encryption (KDF) context.
 - Node-wizard deployment logging: every SSH/RPC call and the wizard's own
   step narration now goes to the Logs tab, so a stuck deployment is
   diagnosable without a debugger.
