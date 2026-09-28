@@ -8,17 +8,55 @@ All notable changes to OpenFluxAndroid. Format loosely follows
 ### Added
 
 - «Своя нода»: a new channel is no longer Yandex-only. Step 2 picks any mix
-  of a Yandex document (Volga), a Mail.ru public document and cups.online
-  rooms (created automatically), with direct always on as the backup; the
-  link and the saved profile carry all of them. The node gets the Yandex
-  sign-in only when the channel has a Yandex document.
+  of a Yandex document (your own link), a Mail.ru public document and
+  cups.online rooms (created automatically), with direct always on as the
+  backup; the link and the saved profile carry all of them.
 - «Автообновление ядра» on the plan step (on by default): the server's
   `openflux-node-update.timer` checks the newest `node-v*` release every
   6 hours, verifies it against the release's `node-install.sh` and
   `SHA256SUMS`, restarts the channels and rolls back if one does not stay
   up.
-- Bumps `OpenFlux` to [`1394680`](https://github.com/p1neappleXpress/OpenFlux/commit/1394680027f7d2cf448f17267c13b9f5a44b859b)
-  and `shared` to [`abf9c97`](https://github.com/p1neappleXpress/OpenFluxClientShared/commit/abf9c97a75f1fac9e09cbcc81aa74a754ef76aa3).
+- Bumps `OpenFlux` to [`c3d9eaf`](https://github.com/p1neappleXpress/OpenFlux/commit/c3d9eaf3d2e86fd31a05d5a16acf5698ebdca341)
+  and `shared` to [`44710e9`](https://github.com/p1neappleXpress/OpenFluxClientShared/commit/44710e90c2410ad23a51f6bd327d75d027b21e34).
+
+## [2.1.0] - 2026-09-28
+
+### Changed
+
+- Share links are read and made by the core, the way every client does:
+  bumps `OpenFlux` to [`2ec01a5`](https://github.com/p1neappleXpress/OpenFlux/commit/2ec01a5) (core 0.2.0) and `shared` to
+  [`ae5e59a`](https://github.com/p1neappleXpress/OpenFluxClientShared/commit/ae5e59a).
+  - A link that picked up line breaks, spaces, non-breaking or zero-width
+    characters, padding or the standard base64 alphabet on the way imports,
+    as on iOS, instead of «Ссылка повреждена».
+  - The same profile makes the same link on Desktop, Android and iOS; the
+    core names the encryption context of a Session link, the app no longer
+    derives it.
+  - A refused link says why: not a link, cut short, letters changed case,
+    unknown transport, key too short, and so on.
+  - The node wizard installs `node-v1.1.0`, the node build of core 0.2.0.
+- The node wizard's document step takes the link of a document you
+  created; the button that signed in to Yandex and created one is gone.
+- The release notes show this changelog.
+
+### Fixed
+
+- Clients and nodes built from different trees now connect: bumps `OpenFlux`
+  to [`f8f3476`](https://github.com/p1neappleXpress/OpenFlux/commit/f8f34767a5732febd5965ac6cf95bad51b70cf99).
+  - A classic profile with a key runs the Session and falls back to the
+    classic layering for a classic or older node, on the same carrier; a
+    node set up as classic serves both kinds of client. Nodes set up for
+    the Session stay Session-only.
+  - The encryption context follows one rule everywhere, and a client whose
+    context differs from the node's finds the node's instead of timing out
+    (classic cups.online was the common case).
+  - The classic codec (batched or legacy) is no longer a hard requirement:
+    both are accepted and the client switches when the node does not answer.
+  - boards no longer drops the connection every 20 seconds; yandex and
+    mailru reconnect when their socket dies.
+  - The log explains a failed handshake: wrong key, a node in the other
+    mode, the codec or context picked, a connection taken over by another
+    client.
 
 ## [2.0.1] - 2026-09-27
 

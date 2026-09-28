@@ -3,12 +3,13 @@ package io.openflux.android
 import android.app.Application
 import android.content.Context
 import io.openflux.android.core.AndroidConnectionService
+import io.openflux.android.core.MobileCoreLinks
 import io.openflux.android.node.AndroidNodeWizard
 import io.openflux.android.platform.AndroidPlatformServices
 import io.openflux.desktop.data.FileProfileRepository
 import io.openflux.desktop.data.FileSettingsRepository
-import io.openflux.desktop.data.JvmShareLinkCodec
 import io.openflux.desktop.model.AppSettings
+import io.openflux.desktop.model.CoreShareLinkCodec
 import io.openflux.desktop.service.AppContainer
 
 /**
@@ -36,7 +37,7 @@ class OpenFluxApplication : Application() {
             settings = settings,
             connection = connection,
             platform = AndroidPlatformServices(this, bridge),
-            shareCodec = JvmShareLinkCodec(),
+            shareCodec = CoreShareLinkCodec(MobileCoreLinks),
             nodeWizard = AndroidNodeWizard(),
         )
     }
