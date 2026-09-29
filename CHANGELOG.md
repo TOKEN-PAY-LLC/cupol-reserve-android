@@ -16,8 +16,19 @@ All notable changes to OpenFluxAndroid. Format loosely follows
   6 hours, verifies it against the release's `node-install.sh` and
   `SHA256SUMS`, restarts the channels and rolls back if one does not stay
   up.
-- Bumps `OpenFlux` to [`c3d9eaf`](https://github.com/p1neappleXpress/OpenFlux/commit/c3d9eaf3d2e86fd31a05d5a16acf5698ebdca341)
-  and `shared` to [`44710e9`](https://github.com/p1neappleXpress/OpenFluxClientShared/commit/44710e90c2410ad23a51f6bd327d75d027b21e34).
+
+### Changed
+
+- The node wizard no longer signs in to Yandex: the document step takes
+  the link of a document you created, and the node gets no account
+  cookies. Solving a captcha on the phone, or for a node through the
+  phone, works as before.
+- The node's `node-install.sh` is tested on Ubuntu 20.04–24.04, Debian
+  12–13, Rocky 9, Alma 8, Fedora 42, Arch and openSUSE Leap 15.6; on the
+  server `node-install.sh list` shows the channels, `remove <channel>`
+  deletes one and `uninstall` removes the node completely.
+- Bumps `OpenFlux` to [`39b3356`](https://github.com/p1neappleXpress/OpenFlux/commit/39b335655da147f87271c9ebe43e799d14977e9b)
+  and `shared` to [`383c2de`](https://github.com/p1neappleXpress/OpenFluxClientShared/commit/383c2de303dc0a568739a7020e2dec17285de558).
 
 ## [2.1.0] - 2026-09-28
 
