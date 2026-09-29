@@ -49,7 +49,8 @@ android {
     signingConfigs {
         create("release") {
             val keystore = System.getenv("ANDROID_KEYSTORE_FILE")
-            if (!keystore.isNullOrBlank()) {
+            // A dry run of the release workflow names the file but does not restore it.
+            if (!keystore.isNullOrBlank() && file(keystore).exists()) {
                 storeFile = file(keystore)
                 storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
                 keyAlias = System.getenv("ANDROID_KEY_ALIAS")
