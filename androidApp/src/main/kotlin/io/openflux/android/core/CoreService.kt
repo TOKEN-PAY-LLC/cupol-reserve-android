@@ -61,7 +61,7 @@ class CoreService : VpnService() {
      */
     fun establish(mtu: Int, dns: String): ParcelFileDescriptor? {
         val builder = Builder()
-            .setSession("OpenFlux")
+            .setSession("CUPOL Reserve")
             .setMtu(mtu)
             .addAddress("10.10.10.2", 24)
             .addRoute("0.0.0.0", 0)
@@ -101,7 +101,7 @@ class CoreService : VpnService() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
         return Notification.Builder(this, CORE_CHANNEL)
-            .setContentTitle("OpenFlux")
+            .setContentTitle("CUPOL Reserve")
             .setContentText(text)
             .setSmallIcon(R.drawable.ic_openflux_notification)
             .setOngoing(true)
@@ -120,7 +120,7 @@ class CoreService : VpnService() {
 
         fun createChannels(context: Context) {
             val manager = context.getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(NotificationChannel(CORE_CHANNEL, "Подключение OpenFlux", NotificationManager.IMPORTANCE_LOW))
+            manager.createNotificationChannel(NotificationChannel(CORE_CHANNEL, "Подключение CUPOL Reserve", NotificationManager.IMPORTANCE_LOW))
             manager.createNotificationChannel(NotificationChannel(CAPTCHA_CHANNEL, "Проверка Яндекса", NotificationManager.IMPORTANCE_HIGH))
         }
 
@@ -134,10 +134,10 @@ class CoreService : VpnService() {
         fun notifyCaptcha(context: Context, remote: Boolean, login: Boolean) {
             createChannels(context)
             val title = when {
-                remote && login -> "OpenFlux: ноде нужен вход в Яндекс"
-                remote -> "OpenFlux: нода просит пройти проверку"
-                login -> "OpenFlux: нужен вход в Яндекс"
-                else -> "OpenFlux: нужна проверка Яндекса"
+                remote && login -> "CUPOL Reserve: ноде нужен вход в Яндекс"
+                remote -> "CUPOL Reserve: нода просит пройти проверку"
+                login -> "CUPOL Reserve: нужен вход в Яндекс"
+                else -> "CUPOL Reserve: нужна проверка Яндекса"
             }
             val notification = Notification.Builder(context, CAPTCHA_CHANNEL)
                 .setContentTitle(title)

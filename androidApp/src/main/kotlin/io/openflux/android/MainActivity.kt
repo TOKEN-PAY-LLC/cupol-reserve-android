@@ -99,7 +99,7 @@ class MainActivity : ComponentActivity() {
     internal fun launchScanner() = scanner.launch(
         ScanOptions()
             .setDesiredBarcodeFormats(ScanOptions.QR_CODE)
-            .setPrompt("Наведите камеру на QR-код OpenFlux")
+            .setPrompt("Наведите камеру на QR-код CUPOL Reserve")
             .setBeepEnabled(false)
             .setOrientationLocked(false),
     )

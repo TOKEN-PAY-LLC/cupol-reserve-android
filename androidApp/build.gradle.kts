@@ -6,7 +6,7 @@ plugins {
 }
 
 /** The app version: -PappVersion=1.2.3 (the release workflow passes the tag). */
-val appVersion = (findProperty("appVersion") as String?)?.removePrefix("v")?.takeIf { it.isNotBlank() } ?: "2.0.0"
+val appVersion = (findProperty("appVersion") as String?)?.removePrefix("v")?.takeIf { it.isNotBlank() } ?: "0.1.0"
 
 /** 1.2.3 -> 10203: grows with every release as Android requires. */
 val appVersionCode = appVersion.split('.', '-').take(3).map { it.toIntOrNull() ?: 0 }
@@ -24,8 +24,8 @@ android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        // Its own id: installs beside the Java app (io.openflux.app).
-        applicationId = "io.openflux.client"
+        // Separate application id: installs beside CUPOL VPN.
+        applicationId = "space.cupol.reserve"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = appVersionCode

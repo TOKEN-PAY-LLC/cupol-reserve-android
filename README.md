@@ -1,4 +1,19 @@
-# OpenFluxAndroid
+# CUPOL Reserve Android
+
+This is a GPL-3.0 fork of [OpenFluxAndroid](https://github.com/p1neappleXpress/OpenFluxAndroid),
+modified by TOKEN PAY LLC on 2026-09-30. It uses the separate CUPOL Reserve
+Core and UI forks and installs as `space.cupol.reserve`. The underlying
+`openflux://` link format remains unchanged for interoperability. The original
+authors and their copyright notices are retained. This is a separate client,
+not a bundled component of the proprietary CUPOL VPN app.
+
+The CUPOL name and logo belong to TOKEN PAY LLC. They do not change the GPL
+license of the code derived from OpenFlux.
+
+The node wizard creates a separate exit channel for one client and imports its
+`openflux://` link. Direct TCP is preferred; document transports remain as
+fallback. Treat that link as a secret. This fork is in prerelease and has not
+been deployed to CUPOL subscribers.
 
 Android client for [OpenFlux](https://github.com/p1neappleXpress/OpenFlux):
 system VPN or local SOCKS5, multi-transport sessions with automatic
@@ -16,7 +31,7 @@ tag.
 ## Getting the code
 
 ```bash
-git clone --recurse-submodules https://github.com/p1neappleXpress/OpenFluxAndroid.git
+git clone --recurse-submodules https://github.com/TOKEN-PAY-LLC/cupol-reserve-android.git
 ```
 
 Already cloned without `--recurse-submodules`?
@@ -27,10 +42,10 @@ git submodule update --init --recursive
 
 This checks out two submodules:
 
-- `shared/` → [OpenFluxClientShared](https://github.com/p1neappleXpress/OpenFluxClientShared),
+- `shared/` → [CUPOL Reserve UI](https://github.com/TOKEN-PAY-LLC/cupol-reserve-ui),
   the Compose Multiplatform UI and models shared with
   [OpenFluxDesktop](https://github.com/p1neappleXpress/OpenFluxDesktop).
-- `OpenFlux/` → [OpenFlux](https://github.com/p1neappleXpress/OpenFlux), the
+- `OpenFlux/` → [CUPOL Reserve Core](https://github.com/TOKEN-PAY-LLC/cupol-reserve-core), the
   core this app embeds as a library (gomobile).
 
 ## Building

@@ -140,7 +140,7 @@ class AndroidConnectionService(
             else -> Kind.Proxy
         }
         if (kind == Kind.Vpn && !bridge.prepareVpn(context)) {
-            fail(profile, "Android не разрешил OpenFlux включить VPN")
+            fail(profile, "Android не разрешил CUPOL Reserve включить VPN")
             return
         }
         bridge.requestNotifications()
@@ -228,7 +228,7 @@ class AndroidConnectionService(
     internal fun onServiceDestroyed(destroyed: CoreService) {
         if (service !== destroyed) return
         service = null
-        run?.let { if (!it.stopping) failRun(it, "Android остановил службу OpenFlux") }
+        run?.let { if (!it.stopping) failRun(it, "Android остановил службу CUPOL Reserve") }
     }
 
     internal fun onVpnRevoked() {

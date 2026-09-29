@@ -54,7 +54,7 @@ class AndroidPlatformServices(
         runCatching { clipboard.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString() }.getOrNull()
 
     override fun setClipboardText(text: String) {
-        clipboard.setPrimaryClip(ClipData.newPlainText("OpenFlux", text))
+        clipboard.setPrimaryClip(ClipData.newPlainText("CUPOL Reserve", text))
     }
 
     override val clipboardImageSupported = false
@@ -141,7 +141,7 @@ class AndroidPlatformServices(
     }
 
     private companion object {
-        const val RELEASE_REPO = "p1neappleXpress/OpenFluxAndroid"
+        const val RELEASE_REPO = "TOKEN-PAY-LLC/cupol-reserve-android"
         const val TAG_PREFIX = "v"
         const val MAX_QR_IMAGE = 2048
         val IMAGE_EXTENSIONS = setOf("png", "jpg", "jpeg", "bmp", "gif", "webp")

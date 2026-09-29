@@ -53,6 +53,6 @@ trap '[ -s "$out/openflux.aar" ] || rm -f "$out/openflux.aar"' EXIT
 rm -f "$out/openflux-sources.jar"
 
 branch=$(git -C "$core" rev-parse --abbrev-ref HEAD)
-rev=$(git -C "$core" describe --always --dirty)
+rev=$(git -C "$core" describe --tags --always --dirty)
 printf '%s@%s\n' "$branch" "$rev" > "$out/openflux-core.version"
 echo "core $(cat "$out/openflux-core.version") -> $out/openflux.aar"

@@ -1,4 +1,4 @@
-rootProject.name = "openfluxandroid"
+rootProject.name = "cupol-reserve-android"
 
 pluginManagement {
     repositories {
