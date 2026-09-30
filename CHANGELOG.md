@@ -3,6 +3,12 @@
 All notable changes to OpenFluxAndroid. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+- Connected proxy mode can copy a sing-box SOCKS5 profile for Hiddify on the same Android phone. CUPOL Reserve remains responsible for the Yandex document transport.
+- SOCKS destination names are resolved through the encrypted exit tunnel in proxy mode.
+- The Hiddify setup guide explains how to keep CUPOL Reserve outside Hiddify's VPN to avoid a routing loop.
+
 ## [2.1.0] - 2026-09-28
 
 ### Changed

@@ -20,6 +20,17 @@ system VPN or local SOCKS5, multi-transport sessions with automatic
 failover, AES-256-GCM encryption, and the in-app flow for passing a
 transport's check (SmartCaptcha, a login wall) through the built-in browser.
 
+## Hiddify on the same Android phone
+
+1. Import a working CUPOL Reserve session. Its Yandex transport needs an editable Yandex Docs editor URL (`https://docs.yandex.ru/edit/d/...`), a matching exit node and the session key. A public file link (`.../i/...`) alone does not establish a channel.
+2. Turn off **VPN: весь трафик телефона** in CUPOL Reserve, then connect the profile. The app keeps its own transport running and listens on `127.0.0.1:<SOCKS port>` without taking Android's VPN slot.
+3. On the connected screen, copy **Hiddify**. In Hiddify, add a profile from the clipboard and select **CUPOL Reserve**.
+4. In Hiddify's split-tunneling settings, exclude the `space.cupol.reserve` app from Hiddify's VPN. Otherwise the Yandex carrier can loop back into the local SOCKS proxy. Keep CUPOL Reserve connected while Hiddify is in use.
+
+The copied profile is a sing-box SOCKS5 outbound supported by Hiddify. It contains only a loopback address and port; the Yandex document, cookies and session secret stay in CUPOL Reserve. TCP and UDP are handled by the local SOCKS5 server. The Android proxy resolves SOCKS hostnames through its encrypted exit tunnel instead of the phone's local resolver. Hiddify's own DNS settings still need to send queries through the selected proxy.
+
+This integration uses two apps on the **same device**. Importing the copied profile on another phone will point to that other phone's own `127.0.0.1` and cannot reach CUPOL Reserve. It has not been validated with a live Yandex exit node or a Hiddify device session yet.
+
 This repository's app code and UI (the `androidApp/` and `shared/` modules)
 come from [meepo161/OpenFluxClient](https://github.com/meepo161/OpenFluxClient),
 used here with the author's agreement. **Huge thanks to
