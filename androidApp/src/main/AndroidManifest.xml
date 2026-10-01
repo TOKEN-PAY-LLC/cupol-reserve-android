@@ -15,7 +15,7 @@
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <application
-        android:name=".OpenFluxApplication"
+        android:name="io.openflux.android.OpenFluxApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="CUPOL Reserve"
@@ -24,7 +24,8 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".MainActivity"
+            android:name="io.openflux.android.MainActivity"
+            tools:ignore="Instantiatable"
             android:exported="true"
             android:launchMode="singleTask"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode|density"
@@ -50,7 +51,7 @@
 
         <!-- Runs the core: the VPN (client), the local proxy or the exit node. -->
         <service
-            android:name=".core.CoreService"
+            android:name="io.openflux.android.core.CoreService"
             android:exported="false"
             android:foregroundServiceType="specialUse"
             android:permission="android.permission.BIND_VPN_SERVICE">

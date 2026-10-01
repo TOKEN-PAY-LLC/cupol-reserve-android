@@ -63,7 +63,7 @@ jobs:
       - name: Install Android SDK components
         run: |
           yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager "platforms;android-35" "build-tools;35.0.0" "ndk;27.0.12077973"
+          sdkmanager "platforms;android-36" "build-tools;36.0.0" "ndk;28.2.13676358"
 
       - name: Install gomobile
         run: |
@@ -97,7 +97,7 @@ jobs:
         if: inputs.publish || startsWith(github.ref, 'refs/tags/v')
         run: |
           find androidApp/build/outputs/apk/release -name '*.apk' -print0 | \
-            xargs -0 -r -n1 "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose
+            xargs -0 -r -n1 "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose
 
       - name: Collect
         run: |

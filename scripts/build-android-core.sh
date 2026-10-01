@@ -7,7 +7,7 @@
 #   scripts/build-android-core.sh ../OpenFlux # or any other checkout
 #
 # Needs Go, gomobile (go install golang.org/x/mobile/cmd/gomobile@latest) and
-# the Android SDK with NDK 27 (ANDROID_HOME / ANDROID_NDK_HOME, or the SDK in
+# the Android SDK with NDK 28 (ANDROID_HOME / ANDROID_NDK_HOME, or the SDK in
 # its default place).
 set -euo pipefail
 
@@ -27,7 +27,7 @@ if [ -z "$sdk" ]; then
   done
 fi
 [ -d "$sdk" ] || { echo "Android SDK not found: set ANDROID_HOME" >&2; exit 1; }
-ndk=${ANDROID_NDK_HOME:-$sdk/ndk/27.0.12077973}
+ndk=${ANDROID_NDK_HOME:-$sdk/ndk/28.2.13676358}
 [ -d "$ndk" ] || { echo "Android NDK not found at $ndk: set ANDROID_NDK_HOME" >&2; exit 1; }
 
 gomobile=${GOMOBILE_BIN:-$(command -v gomobile || true)}
@@ -47,7 +47,7 @@ trap '[ -s "$out/openflux.aar" ] || rm -f "$out/openflux.aar"' EXIT
   -target=android \
   -androidapi=26 \
   -javapkg=io.openflux.bridge \
-  -ldflags="-checklinkname=0 -s -w" \
+  -ldflags="-checklinkname=0 -s -w -linkmode=external -extldflags=-Wl,-z,max-page-size=16384" \
   -o "$out/openflux.aar" \
   .)
 rm -f "$out/openflux-sources.jar"

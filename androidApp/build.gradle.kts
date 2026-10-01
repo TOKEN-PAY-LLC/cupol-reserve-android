@@ -1,3 +1,6 @@
+import org.gradle.api.tasks.compile.JavaCompile
+import java.io.File
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
@@ -92,4 +95,43 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.zxing.core)
     implementation(libs.zxing.android)
+}
+
+// Lint 9.2 misidentifies this Kotlin 2.4 Activity hierarchy. The manifest
+// suppresses that one finding; the release still verifies the actual JVM
+// superclass chain and public constructor before an APK can be assembled.
+val verifyReleaseActivityHierarchy by tasks.registering {
+    dependsOn("compileReleaseKotlin", "compileReleaseJavaWithJavac")
+    val compiled = layout.buildDirectory.dir("tmp/kotlin-classes/release")
+    inputs.dir(compiled)
+    val report = layout.buildDirectory.file("reports/release-activity-hierarchy.txt")
+    outputs.file(report)
+    doLast {
+        val javaCompile = tasks.named<JavaCompile>("compileReleaseJavaWithJavac").get()
+        val classpath = (javaCompile.classpath.files + compiled.get().asFile)
+            .joinToString(File.pathSeparator) { it.absolutePath }
+        val tool = File(System.getProperty("java.home"),
+            "bin/javap" + if (System.getProperty("os.name").startsWith("Windows")) ".exe" else "")
+        fun inspect(name: String): String {
+            val process = ProcessBuilder(tool.absolutePath, "-classpath", classpath, name)
+                .redirectErrorStream(true).start()
+            val text = process.inputStream.bufferedReader().readText()
+            check(process.waitFor() == 0) { "Could not inspect $name" }
+            return text
+        }
+        val activity = inspect("io.openflux.android.MainActivity")
+        val component = inspect("androidx.activity.ComponentActivity")
+        val core = inspect("androidx.core.app.ComponentActivity")
+        check(activity.contains("public final class io.openflux.android.MainActivity extends androidx.activity.ComponentActivity"))
+        check(activity.contains("public io.openflux.android.MainActivity();"))
+        check(component.contains("extends androidx.core.app.ComponentActivity"))
+        check(core.contains("extends android.app.Activity"))
+        report.get().asFile.apply {
+            parentFile.mkdirs()
+            writeText("Public no-argument constructor and Activity superclass chain verified.\n")
+        }
+    }
+}
+tasks.matching { it.name == "assembleRelease" }.configureEach {
+    dependsOn(verifyReleaseActivityHierarchy)
 }
