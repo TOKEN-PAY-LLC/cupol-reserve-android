@@ -610,7 +610,7 @@ class AndroidConnectionService(
     private fun proxyListenAddress(settings: AppSettings): String {
         val local = proxyAddress(settings)
         if (!settings.lanProxyEnabled) return local
-        val lanHost = settings.lanProxyHost.ifBlank { localAddress().orEmpty() }
+        val lanHost = settings.lanProxyHost.ifBlank { wifiAddress().orEmpty() }
         require(lanHost.isNotBlank()) { "Не найден IP телефона: включите Wi-Fi или точку доступа" }
         require(Regex("(?:[0-9]{1,3}\\.){3}[0-9]{1,3}").matches(lanHost)) { "Укажите IPv4 телефона для раздачи" }
         val lanIp = InetAddress.getByName(lanHost)
@@ -628,8 +628,8 @@ class AndroidConnectionService(
         manager.getLinkProperties(manager.activeNetwork)?.dnsServers?.firstOrNull { it is Inet4Address }?.hostAddress
     }.getOrNull() ?: FALLBACK_DNS
 
-    /** This phone's address on its local network (Wi-Fi first), for clients of the exit. */
-    private fun localAddress(): String? = runCatching {
+    /** Wi-Fi or hotspot address, used only by the shared proxy. */
+    private fun wifiAddress(): String? = runCatching {
         NetworkInterface.getNetworkInterfaces().toList()
             .filter { it.isUp && !it.isLoopback && !it.isVirtual }
             .filter { it.name.startsWith("ap") || it.name.startsWith("softap") || it.name.startsWith("swlan") || it.name.startsWith("wlan") }
@@ -640,6 +640,15 @@ class AndroidConnectionService(
                     else -> 2
                 }
             }
+            .flatMap { it.inetAddresses.toList() }
+            .firstOrNull { it is Inet4Address && it.isSiteLocalAddress }?.hostAddress
+    }.getOrNull()
+
+    /** This phone's address on its local network (Wi-Fi first), for clients of the exit. */
+    private fun localAddress(): String? = runCatching {
+        NetworkInterface.getNetworkInterfaces().toList()
+            .filter { it.isUp && !it.isLoopback && !it.isVirtual }
+            .sortedBy { if (it.name.startsWith("wlan")) 0 else 1 }
             .flatMap { it.inetAddresses.toList() }
             .firstOrNull { it is Inet4Address && it.isSiteLocalAddress }?.hostAddress
     }.getOrNull()
