@@ -39,6 +39,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.File
 import java.net.HttpURLConnection
+import java.net.InetAddress
 import java.net.Inet4Address
 import java.net.InetSocketAddress
 import java.net.NetworkInterface
@@ -132,6 +133,10 @@ class AndroidConnectionService(
         clearCaptcha()
         profile.problems().firstOrNull()?.let {
             fail(profile, it)
+            return
+        }
+        if (current.lanProxyEnabled && !Regex("[0-9a-fA-F]{64}").matches(current.lanProxyPassword)) {
+            fail(profile, "Для раздачи SOCKS5 нужен пароль. Выключите и включите раздачу в настройках")
             return
         }
         val kind = when {
@@ -280,7 +285,9 @@ class AndroidConnectionService(
             val specs = CoreSpecs.session(profile, exit = current.kind == Kind.Exit, directPort = current.settings.exitDirectPort)
             when (current.kind) {
                 Kind.Vpn -> Mobile.startSession(specs, secret)
-                Kind.Proxy -> Mobile.startSessionProxy(specs, secret, proxyAddress(current.settings), "", "", "")
+                Kind.Proxy -> Mobile.startSessionProxy(specs, secret, proxyListenAddress(current.settings),
+                    if (current.settings.lanProxyEnabled) "cupol" else "",
+                    if (current.settings.lanProxyEnabled) current.settings.lanProxyPassword else "", "")
                 Kind.Exit -> Mobile.startSessionExit(specs, secret)
             }
         } else {
@@ -288,7 +295,9 @@ class AndroidConnectionService(
             val codec = profile.codec.cliName
             when (current.kind) {
                 Kind.Vpn -> Mobile.start(type, url, secret, codec, token, uid)
-                Kind.Proxy -> Mobile.startProxy(type, url, secret, codec, token, uid, proxyAddress(current.settings), "", "", "")
+                Kind.Proxy -> Mobile.startProxy(type, url, secret, codec, token, uid, proxyListenAddress(current.settings),
+                    if (current.settings.lanProxyEnabled) "cupol" else "",
+                    if (current.settings.lanProxyEnabled) current.settings.lanProxyPassword else "", "")
                 Kind.Exit -> Mobile.startExit(type, url, secret, codec, token, uid)
             }
         }.orEmpty()
@@ -598,6 +607,20 @@ class AndroidConnectionService(
         }
 
     private fun proxyAddress(settings: AppSettings) = "$LOOPBACK:${settings.socksPort}"
+    private fun proxyListenAddress(settings: AppSettings): String {
+        val local = proxyAddress(settings)
+        if (!settings.lanProxyEnabled) return local
+        val lanHost = settings.lanProxyHost.ifBlank { localAddress().orEmpty() }
+        require(lanHost.isNotBlank()) { "Не найден IP телефона: включите Wi-Fi или точку доступа" }
+        require(Regex("(?:[0-9]{1,3}\\.){3}[0-9]{1,3}").matches(lanHost)) { "Укажите IPv4 телефона для раздачи" }
+        val lanIp = InetAddress.getByName(lanHost)
+        val lanInterface = NetworkInterface.getByInetAddress(lanIp)
+        require(lanIp is Inet4Address && lanIp.isSiteLocalAddress && lanInterface?.isUp == true &&
+            lanInterface.name.let { name -> listOf("ap", "softap", "swlan", "wlan").any(name::startsWith) }) {
+            "Адрес раздачи должен принадлежать Wi-Fi или точке доступа этого телефона"
+        }
+        return "$local|$lanHost:${settings.socksPort}"
+    }
 
     /** The DNS server of the network the phone uses, before the VPN is up. */
     private fun networkDns(): String = runCatching {
@@ -609,7 +632,14 @@ class AndroidConnectionService(
     private fun localAddress(): String? = runCatching {
         NetworkInterface.getNetworkInterfaces().toList()
             .filter { it.isUp && !it.isLoopback && !it.isVirtual }
-            .sortedBy { if (it.name.startsWith("wlan")) 0 else 1 }
+            .filter { it.name.startsWith("ap") || it.name.startsWith("softap") || it.name.startsWith("swlan") || it.name.startsWith("wlan") }
+            .sortedBy {
+                when {
+                    it.name.startsWith("ap") || it.name.startsWith("softap") || it.name.startsWith("swlan") -> 0
+                    it.name.startsWith("wlan") -> 1
+                    else -> 2
+                }
+            }
             .flatMap { it.inetAddresses.toList() }
             .firstOrNull { it is Inet4Address && it.isSiteLocalAddress }?.hostAddress
     }.getOrNull()

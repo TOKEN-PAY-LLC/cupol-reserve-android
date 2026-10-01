@@ -30,6 +30,8 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.Inet4Address
+import java.net.NetworkInterface
 import java.security.SecureRandom
 
 class AndroidPlatformServices(
@@ -47,6 +49,21 @@ class AndroidPlatformServices(
     /** The VPN: the whole phone through the node. */
     override val fullTunnelSupported = true
     override val elevated = true
+
+    override fun localLanAddress(): String? = runCatching {
+        NetworkInterface.getNetworkInterfaces().toList()
+            .filter { it.isUp && !it.isLoopback && !it.isVirtual }
+            .filter { it.name.startsWith("ap") || it.name.startsWith("softap") || it.name.startsWith("swlan") || it.name.startsWith("wlan") }
+            .sortedBy { iface ->
+                when {
+                    iface.name.startsWith("ap") || iface.name.startsWith("softap") || iface.name.startsWith("swlan") -> 0
+                    iface.name.startsWith("wlan") -> 1
+                    else -> 2
+                }
+            }
+            .flatMap { it.inetAddresses.toList() }
+            .firstOrNull { it is Inet4Address && it.isSiteLocalAddress }?.hostAddress
+    }.getOrNull()
 
     override fun restartElevated() = false
 
