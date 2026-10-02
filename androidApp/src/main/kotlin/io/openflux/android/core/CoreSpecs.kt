@@ -16,11 +16,14 @@ internal object CoreSpecs {
      * dialing, like the desktop's exit .conf.
      */
     fun session(profile: Profile, exit: Boolean, directPort: Int): String {
-        val specs = profile.sessionSpecs().filterNot { exit && it.type == TransportType.DIRECT }
+        val runProfile = if (exit) profile.forExit() else profile
+        val problems = runProfile.problems()
+        require(problems.isEmpty()) { problems.first() }
+        val specs = runProfile.sessionSpecs().filterNot { exit && it.type == TransportType.DIRECT }
         val transports = buildJsonArray {
             for (spec in specs) add(spec(spec.name, spec.type, spec.value, spec.uid, spec.priority))
             // The exit listens for direct only when the profile has it.
-            val direct = profile.carriers.firstOrNull { it.type == TransportType.DIRECT }
+            val direct = runProfile.carriers.firstOrNull { it.type == TransportType.DIRECT }
             if (exit && direct != null) {
                 add(buildJsonObject {
                     put("name", "direct")
@@ -31,9 +34,9 @@ internal object CoreSpecs {
                 })
             }
         }
-        if (profile.context.isBlank()) return transports.toString()
+        if (runProfile.effectiveSessionContext.isBlank()) return transports.toString()
         return buildJsonObject {
-            put("context", profile.context)
+            put("context", runProfile.effectiveSessionContext)
             put("transports", transports)
         }.toString()
     }

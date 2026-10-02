@@ -42,6 +42,7 @@ class AndroidPlatformServices(
     private val clipboard get() = context.getSystemService(ClipboardManager::class.java)
 
     override val kind = PlatformKind.Android
+    override val languageCode: String get() = context.resources.configuration.locales[0].language
     override val appVersion: String = BuildConfig.VERSION_NAME
     override val coreVersion: String = BuildConfig.CORE_VERSION
     override val clientRepo: String = RELEASE_REPO

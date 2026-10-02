@@ -95,6 +95,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.zxing.core)
     implementation(libs.zxing.android)
+    testImplementation(libs.kotlin.testJunit)
 }
 
 // Lint 9.2 misidentifies this Kotlin 2.4 Activity hierarchy. The manifest
